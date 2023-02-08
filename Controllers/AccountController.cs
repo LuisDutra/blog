@@ -62,10 +62,35 @@ public class AccountController : ControllerBase
     }
     
     [HttpPost("v1/login")]
-    public IActionResult Login()
+    public async Task<IActionResult> Login(
+        [FromBody] LoginViewModel model,
+        [FromServices] BlogDataContext context)
     {
-        var token = _tokenService.GenerateToken(null);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ResultViewModel<string>(ModelState.GetErros()));
+        }
 
-        return Ok(token);
+        var user = await context
+            .Users
+            .AsNoTracking()
+            .Include(x => x.Roles)
+            .FirstOrDefaultAsync(x => x.Email == model.Email);
+
+        if (user == null)
+            return StatusCode(401, new ResultViewModel<string>("Usuario ou senha invalido"));
+        
+        if(!PasswordHasher.Verify(user.PasswordHash, model.Password))
+            return StatusCode(401, new ResultViewModel<string>("Usuario ou senha invalido"));
+
+        try
+        {
+            var token = _tokenService.GenerateToken(user);
+            return Ok(new ResultViewModel<string>(token, null));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<string>("Server error"));
+        }
     }
 }
