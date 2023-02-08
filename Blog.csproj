@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Compile Remove="ViewModels\UpdateCategoryViewModel.cs" />
+    <Compile Remove="Extensions\RoleClaimExtensions.cs" />
   </ItemGroup>
 
 </Project>
