@@ -15,7 +15,7 @@ namespace Blog.Data
         // public DbSet<UserRole> UserRoles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseNpgsql("Host=localhost;Port=49153;Database=Blog;User ID=postgres;Password=postgrespw");
+            => options.UseNpgsql("Host=localhost;Port=32768;Database=Blog;User ID=postgres;Password=postgrespw");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

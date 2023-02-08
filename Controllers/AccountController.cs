@@ -5,6 +5,8 @@ using Blog.Services;
 using Blog.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SecureIdentity.Password;
 
 namespace Blog.Controllers;
 
@@ -35,10 +37,28 @@ public class AccountController : ControllerBase
             Slug = model.Email.Replace("@", "_").Replace(".", "-")
         };
 
-        await context.Users.AddAsync(user);
-        await context.SaveChangesAsync();
+        var password = PasswordGenerator.Generate(25);
+        user.PasswordHash = PasswordHasher.Hash(password);
 
-        return Ok(new ResultViewModel<User>(user));
+        try
+        {
+            await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
+
+            return Ok(new ResultViewModel<dynamic>(new
+            {
+                user = user.Email, password
+            }));
+        }
+        catch (DbUpdateException)
+        {
+            return StatusCode(400, new ResultViewModel<string>("Usuario ja cadastrado"));
+        }
+        
+        catch 
+        {
+            return StatusCode(500, new ResultViewModel<string>("Server Error"));
+        }
     }
     
     [HttpPost("v1/login")]
