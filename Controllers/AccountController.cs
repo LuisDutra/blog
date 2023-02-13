@@ -3,7 +3,6 @@ using Blog.Extensions;
 using Blog.Models;
 using Blog.Services;
 using Blog.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SecureIdentity.Password;
@@ -23,6 +22,7 @@ public class AccountController : ControllerBase
     [HttpPost("v1/accounts")]
     public async Task<IActionResult> Post(
         [FromBody] RegisterViewModel model,
+        [FromServices] EmailService emailService,
         [FromServices] BlogDataContext context)
     {
         if (!ModelState.IsValid)
@@ -39,11 +39,19 @@ public class AccountController : ControllerBase
 
         var password = PasswordGenerator.Generate(25);
         user.PasswordHash = PasswordHasher.Hash(password);
+        
+        
 
         try
         {
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
+
+            emailService.Send(
+                user.Name, 
+                user.Email, 
+                "Bem vindo ao teste", 
+                $"Sua senha é {password}");
 
             return Ok(new ResultViewModel<dynamic>(new
             {

@@ -28,7 +28,7 @@ void LoadConfiguration(WebApplication app)
     Configuration.ApiKey = app.Configuration.GetValue<string>("ApiKey");
 
     var smtp = new Configuration.SmtpConfiguration();
-    app.Configuration.GetSection("SmtpConfiguration").Bind(smtp);
+    app.Configuration.GetSection("Smtp").Bind(smtp);
     Configuration.Smtp = smtp;
 }
 
@@ -65,4 +65,5 @@ void ConfigureServices(WebApplicationBuilder builder)
 {
     builder.Services.AddDbContext<BlogDataContext>();
     builder.Services.AddTransient<TokenService>();
+    builder.Services.AddTransient<EmailService>();
 }
