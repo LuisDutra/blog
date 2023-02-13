@@ -23,4 +23,8 @@
     <Compile Remove="Attributes.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Wwwroot\Images" />
+  </ItemGroup>
+
 </Project>
