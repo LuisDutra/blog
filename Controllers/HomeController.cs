@@ -8,8 +8,8 @@ namespace Blog.Controllers;
 public class HomeController : ControllerBase
 {
     [HttpGet("")]
-    public IActionResult Get()
+    public IActionResult Get([FromServices] IConfiguration config)
     {
-        return Ok();
+        return Ok(config.GetValue<string>("Env"));
     }
 }
